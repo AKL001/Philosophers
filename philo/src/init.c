@@ -1,0 +1,1 @@
+// Functions to initialize structs, threads & mutexes
