@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stddef.h>
 
 typedef struct s_philosopher {
     int             id;
@@ -29,9 +30,14 @@ typedef struct s_data {
     t_philosopher   *philos;
 } t_data;
 
+/* INIT */
+int     valid_agruments(int argc,char **argv,t_data *data);
 
 
-
+/*  utils  libft */
+int	ft_atoi(const char *src);
+void	ft_putstr_fd(char *s, int fd);
+int	is_numeric(const char *str);
 
 
 
