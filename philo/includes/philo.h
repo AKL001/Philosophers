@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stddef.h>
+#include <sys/time.h>
+
+
 
 typedef struct s_philosopher {
     int             id;
@@ -24,6 +27,7 @@ typedef struct s_data {
     int             time_to_sleep;
     int             max_meals;
     int             is_simulation_running;
+    pthread_mutex_t simulation_lock;
     long long       start_time;
     pthread_mutex_t *forks;
     pthread_mutex_t print_lock;
@@ -32,7 +36,30 @@ typedef struct s_data {
 
 /* INIT */
 int     valid_agruments(int argc,char **argv,t_data *data);
+int init_all(t_data *data, int argc, char **argv);
 
+
+/* get time */
+long long get_time_in_ms(void);
+
+/* MONITOR */
+void *monitor_threads(void *arg);
+void smart_sleep(long long duration, t_data *data);
+
+
+/* ACTIONS */
+void eat(t_philosopher *philo);
+void    take_forks(t_philosopher *philo);
+void put_down_forks(t_philosopher *philo);
+void *philosopher_routine(void *arg);
+
+/*  utils  */
+int    philos_threads(t_data *data);
+void print_action(t_philosopher *philo, char *action);
+int is_simulation_running(t_data *data);
+
+/* ROUTINE */
+void *philo_routine(void *arg);
 
 /*  utils  libft */
 int	ft_atoi(const char *src);

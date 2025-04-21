@@ -11,6 +11,26 @@ int	valid_philo_num(const char *arg)
 	return (0);
 }
 
+int	valid_ms(const char *arg)
+{
+	if (!is_numeric(arg) || ft_atoi(arg) <= 0)
+	{
+		ft_putstr_fd("Error: Invalid number of ms argument\n", 2);
+		return (1);
+	}
+	return (0);
+}
+
+int	valid_must_eat(const char *arg)
+{
+	if (!is_numeric(arg) || ft_atoi(arg) <= 0)
+	{
+		ft_putstr_fd("Error: Invalid number of must eat argument\n", 2);
+		return (1);
+	}
+	return (0);
+}
+
 int     valid_agruments(int argc,char **argv,t_data *data)
 {
 
@@ -20,10 +40,10 @@ int     valid_agruments(int argc,char **argv,t_data *data)
 		return (1);
 	}
 	if (valid_philo_num(argv[1])
-		|| valid_philo_num(argv[2])
-		|| valid_philo_num(argv[3])
-		|| valid_philo_num(argv[4])
-		|| (argc == 6 && valid_philo_num(argv[5])))
+		|| valid_ms(argv[2])
+		|| valid_ms(argv[3])
+		|| valid_ms(argv[4])
+		|| (argc == 6 && valid_must_eat(argv[5])))
 	{
 		return (1);
 	}
