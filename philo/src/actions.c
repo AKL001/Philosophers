@@ -8,6 +8,10 @@ void put_down_forks(t_philosopher *philo)
     pthread_mutex_unlock(philo->right_fork);
 }
 
+void think(t_philosopher *philo)
+{
+    // also thinking need a method for it 
+}
 void eat(t_philosopher *philo)
 {
     pthread_mutex_lock(&philo->data->simulation_lock);
