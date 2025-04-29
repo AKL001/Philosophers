@@ -33,6 +33,9 @@ void start_simulation(t_data *data)
     int       i;
 
     data->start_time = get_time_in_ms();
+    i = -1;
+    while(++i < data->num_philos)
+        data->philos[i].last_meal_time = data->start_time;
     if (philos_threads(data))
         return ;
     if (pthread_create(&monitor, NULL, monitor_threads, data) != 0)
@@ -46,14 +49,17 @@ void start_simulation(t_data *data)
     pthread_join(monitor, NULL);
 }
 
-
 int main(int argc, char **argv)
 {
     t_data data;
 
     if (argc == 5 || argc == 6)
     {
-        init_all(&data, argc, argv);
+        if (init_all(&data, argc, argv) != 0)
+        {
+            // cleanup(&data);
+            return (1);
+        }
         // print_data_state(&data);
         start_simulation(&data);
     }

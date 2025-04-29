@@ -27,8 +27,9 @@ typedef struct s_data {
     int             time_to_sleep;
     int             max_meals;
     int             is_simulation_running;
-    pthread_mutex_t simulation_lock;
     long long       start_time;
+    pthread_mutex_t meal_lock;
+    pthread_mutex_t simulation_lock;
     pthread_mutex_t *forks;
     pthread_mutex_t print_lock;
     t_philosopher   *philos;
@@ -45,13 +46,16 @@ long long get_time_in_ms(void);
 /* MONITOR */
 void *monitor_threads(void *arg);
 void smart_sleep(long long duration, t_data *data);
-
+void stop_simulation(t_data *data);
 
 /* ACTIONS */
 void eat(t_philosopher *philo);
 void    take_forks(t_philosopher *philo);
 void put_down_forks(t_philosopher *philo);
 void *philosopher_routine(void *arg);
+void think(t_philosopher *philo);
+// void better_sleep(long long time);
+void ft_sleep(t_philosopher *philo);
 
 /*  utils  */
 int    philos_threads(t_data *data);

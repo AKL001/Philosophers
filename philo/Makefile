@@ -18,7 +18,7 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	cc $(CFLAGS) $(OBJS) -o $(NAME) -g
-	@make clean
+	@make clean	
 # gcc -fsanitize=thread -g 
 # valgrind --tool=helgrind ./philo <args>
 # valgrind --tool=drd ./philo <args>.

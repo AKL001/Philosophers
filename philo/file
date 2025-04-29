@@ -1,0 +1,376 @@
+#include "../includes/philo.h"
+#include <pthread.h>
+
+
+void put_down_forks(t_philosopher *philo)
+{
+    pthread_mutex_unlock(philo->left_fork);
+    pthread_mutex_unlock(philo->right_fork);
+}
+
+void think(t_philosopher *philo)
+{
+    long long time_to_think;
+    
+    if(philo->data->is_simulation_running == 0)
+        return;
+    pthread_mutex_lock(&philo->data->meal_lock);
+    time_to_think = (philo->data->time_to_die - 
+                    (get_time_in_ms() - philo->last_meal_time)) / 2;
+    pthread_mutex_unlock(&philo->data->meal_lock);
+    
+    // Constrain thinking time
+    if (time_to_think < 10)
+        time_to_think = 10;
+    if (time_to_think > 200)
+        time_to_think = 200;
+    print_action(philo,"is thinking");
+    smart_sleep(time_to_think, philo->data);
+}
+
+void ft_sleep(t_philosopher *philo)
+{
+    print_action(philo,"is sleeping");
+    smart_sleep(philo->data->time_to_sleep,philo->data);
+}
+void eat(t_philosopher *philo)
+{   
+    pthread_mutex_lock(&philo->data->meal_lock);
+    philo->last_meal_time = get_time_in_ms();
+    philo->meals_eaten++;
+    pthread_mutex_unlock(&philo->data->meal_lock);
+
+    print_action(philo, "is eating");
+    smart_sleep(philo->data->time_to_eat, philo->data);
+}
+
+void take_forks(t_philosopher *philo)
+{
+    if (philo->id % 2 == 0)
+    {
+        pthread_mutex_lock(philo->left_fork);
+        print_action(philo, "has taken a fork");
+        pthread_mutex_lock(philo->right_fork);
+        print_action(philo, "has taken a fork");
+    }
+    else 
+    {
+        pthread_mutex_lock(philo->right_fork);
+        print_action(philo, "has taken a fork");
+        pthread_mutex_lock(philo->left_fork);
+        print_action(philo, "has taken a fork");
+    }
+}
+// Functions to initialize structs, threads & mutexes
+#include "../includes/philo.h"
+#include <stdlib.h>
+
+
+static int init_mutexes(t_data *data)
+{
+    int i;
+
+    data->forks = malloc(sizeof(pthread_mutex_t) * data->num_philos);
+    if (!data->forks)
+        return (1);
+    i = 0;
+    while (i < data->num_philos)
+    {
+        if (pthread_mutex_init(&data->forks[i], NULL) != 0)
+            return (1);
+        i++;
+    }
+    if (pthread_mutex_init(&data->print_lock, NULL) != 0)
+        return (1);
+    if (pthread_mutex_init(&data->simulation_lock, NULL) != 0)
+        return (1);
+    if (pthread_mutex_init(&data->meal_lock, NULL) != 0)
+        return (1);
+    return (0);
+}
+
+static int init_philosophers(t_data *data)
+{
+    int i;
+
+    data->philos = malloc(sizeof(t_philosopher) * data->num_philos);
+    if (!data->philos)
+        return (1);
+    i = 0;
+    while (i < data->num_philos)
+    {
+        data->philos[i].id = i + 1;
+        data->philos[i].meals_eaten = 0;
+        data->philos[i].last_meal_time = get_time_in_ms();
+        // data->philos[i].last_meal_time = get_time_in_ms();
+        // data->philos[i].last_meal_time = 0;
+        data->philos[i].left_fork = &data->forks[i];
+        data->philos[i].right_fork = &data->forks[(i + 1) % data->num_philos];
+        data->philos[i].data = data;
+        i++;
+    }
+    return (0);
+}
+
+int init_all(t_data *data, int argc, char **argv)
+{
+    if (argc != 5 && argc != 6)
+    {
+        printf("Usage: ./philo num_philos time_to_die time_to_eat time_to_sleep [max_meals]\n");
+        return (1);
+    }
+    if (valid_agruments(argc,argv,data))
+        return (1);
+    if (init_mutexes(data))
+    {
+        printf("Failed to initialize mutexes\n");
+        return (1);
+    }
+    if (init_philosophers(data))
+    {
+        printf("Failed to initialize philosophers\n");
+        return (1);
+    }
+    data->is_simulation_running = 1;
+    // init the data->start_time long long
+    // or init the data->start_time just before we start the simulation or 
+    // creating threads
+    return (0);
+}
+#include "../includes/philo.h"
+
+
+void print_data_state(t_data *data)
+{
+    printf("\n===== DATA STATE =====\n");
+    printf("Number of Philosophers: %d\n", data->num_philos);
+    printf("Time to Die: %d ms\n", data->time_to_die);
+    printf("Time to Eat: %d ms\n", data->time_to_eat);
+    printf("Time to Sleep: %d ms\n", data->time_to_sleep);
+    if (data->max_meals != -1)
+        printf("Max Meals: %d\n", data->max_meals);
+    else
+        printf("Max Meals: Unlimited\n");
+    printf("Start Time: %lld\n", data->start_time);
+    printf("=======================\n\n");
+
+    printf("Philosopher Info:\n");
+    for (int i = 0; i < data->num_philos; i++)
+    {
+        printf("Philosopher %d:\n", data->philos[i].id);
+        printf("  Meals Eaten: %d\n", data->philos[i].meals_eaten);
+        printf("  Last Meal Time: %lld\n", data->philos[i].last_meal_time);
+        printf("  Left Fork Address: %p\n", (void *)data->philos[i].left_fork);
+        printf("  Right Fork Address: %p\n", (void *)data->philos[i].right_fork);
+        printf("\n");
+    }
+}
+
+void start_simulation(t_data *data)
+{
+    pthread_t monitor;
+    int       i;
+
+    data->start_time = get_time_in_ms();
+    if (philos_threads(data))
+        return ;
+    if (pthread_create(&monitor, NULL, monitor_threads, data) != 0)
+    {
+        printf("failed to create monitor thread\n");
+        return ;
+    }
+    i = -1;
+    while (++i < data->num_philos)
+        pthread_join(data->philos[i].thread, NULL);
+    pthread_join(monitor, NULL);
+}
+
+int main(int argc, char **argv)
+{
+    t_data data;
+
+    if (argc == 5 || argc == 6)
+    {
+        init_all(&data, argc, argv);
+        // print_data_state(&data);
+        start_simulation(&data);
+    }
+    else {
+        ft_putstr_fd("error\n", 2);
+    }
+    return 0;
+}
+// Thread to check for philosopher deaths
+#include "../includes/philo.h"
+
+
+void stop_simulation(t_data *data)
+{
+    pthread_mutex_lock(&data->simulation_lock);
+    data->is_simulation_running = 0;
+    pthread_mutex_unlock(&data->simulation_lock);
+}
+
+
+int is_simulation_running(t_data *data)
+{
+    int running;
+
+    pthread_mutex_lock(&data->simulation_lock);
+    running = data->is_simulation_running;
+    pthread_mutex_unlock(&data->simulation_lock);
+    return (running);
+}
+
+int all_philos_ate(t_data *data)
+{
+    int i;
+    int all_ate;
+
+    pthread_mutex_lock(&data->meal_lock);
+    all_ate = 1;
+    for (i = 0; i < data->num_philos; i++)
+    {
+        if (data->philos[i].meals_eaten < data->max_meals)
+        {
+            all_ate = 0;
+            break;
+        }
+    }
+    pthread_mutex_unlock(&data->meal_lock);
+    return (all_ate);
+}
+int someone_died(t_data *data)
+{
+    int i;
+    long long now;
+
+    i = 0;
+    while (i < data->num_philos)
+    {
+        pthread_mutex_lock(&data->meal_lock);
+        now = get_time_in_ms();
+        if (now - data->philos[i].last_meal_time > data->time_to_die)
+        {
+            pthread_mutex_unlock(&data->meal_lock);
+            stop_simulation(data);
+            pthread_mutex_lock(&data->print_lock);
+            printf("%lld %d died\n", now - data->start_time, data->philos[i].id);
+            pthread_mutex_unlock(&data->print_lock);
+            return (1);
+        }
+        pthread_mutex_unlock(&data->meal_lock);
+        i++;
+    }
+    return (0);
+}
+
+void *monitor_threads(void *arg)
+{
+    t_data *data = (t_data *)arg;
+
+    while (is_simulation_running(data))
+    {
+        if (someone_died(data))
+            break;
+        if (data->max_meals != -1 && all_philos_ate(data))
+        {
+            stop_simulation(data);
+            break;
+        }
+        usleep(1000);
+    }
+    return (NULL);
+}
+
+
+// void *monitor_threads(void *arg)
+// {
+//     t_data *data = (t_data *)arg;
+//     int i;
+//     long long time_since_last_meal;
+//     int all_ate_enough = 0;
+
+//     while (is_simulation_running(data))
+//     {
+//         i = 0;
+//         all_ate_enough = (data->max_meals != -1);  // Only check if max_meals is set
+        
+//         while (i < data->num_philos)
+//         {
+//             pthread_mutex_lock(&data->simulation_lock);
+            
+//             // Check for death
+//             time_since_last_meal = get_time_in_ms() - data->philos[i].last_meal_time;
+//             if (time_since_last_meal > data->time_to_die)
+//             {
+//                 pthread_mutex_unlock(&data->simulation_lock);
+//                 print_action(&data->philos[i], "died");
+//                 stop_simulation(data);
+//                 return NULL;
+//             }
+            
+//             // Check if all philosophers ate enough meals
+//             // if (data->max_meals != -1 && data->philos[i].meals_eaten < data->max_meals)
+//             //     all_ate_enough = 0;
+//             if (data->max_meals != -1 && all_philos_ate(data))
+//                 break ;
+//             pthread_mutex_unlock(&data->simulation_lock);
+//             i++;
+//         }
+        
+//         // If all philosophers ate enough, stop simulation
+//         if (all_ate_enough)
+//         {
+//             stop_simulation(data);
+//             return NULL;
+//         }
+        
+//         usleep(1000); // Sleep for 1ms to avoid CPU overload
+//     }
+//     return NULL;
+// }
+// Philosopher thread routine (eating, sleeping, thinking)
+#include "../includes/philo.h"
+#include <unistd.h>
+
+void smart_sleep(long long duration, t_data *data)
+{
+    long long start = get_time_in_ms();
+    while (is_simulation_running(data))
+    {
+        if (get_time_in_ms() - start >= duration)
+            break;
+        usleep(100);
+    }
+}
+
+void *philosopher_routine(void *arg)
+{
+    t_philosopher *philo = (t_philosopher *)arg;
+
+    // if (philo->data->num_philos == 1)
+    // {
+    //     print_action(philo, "is thinking");
+    //     pthread_mutex_lock(philo->left_fork);
+    //     print_action(philo, "has taken a fork");
+    //     smart_sleep(philo->data->time_to_die, philo->data);
+    //     print_action(philo, "died");
+    //     stop_simulation(philo->data);
+    //     return NULL;
+    // }
+    if (philo->id % 2 == 0)
+        usleep(700); // tiny delay for even IDs to reduce collision
+    // 700 seems to fix that try other testes 
+    while (is_simulation_running(philo->data))
+    {
+        take_forks(philo);
+        eat(philo);
+        put_down_forks(philo);
+        ft_sleep(philo);
+        // if (!is_simulation_running(philo->data))
+        //     break;
+        think(philo);
+    }
+    return (NULL);
+}

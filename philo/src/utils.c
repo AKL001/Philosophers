@@ -9,15 +9,7 @@ long long get_time_in_ms(void)
     return (tv.tv_sec * 1000LL) + (tv.tv_usec / 1000);
 }
 
-int is_simulation_running(t_data *data)
-{
-    int running;
 
-    pthread_mutex_lock(&data->simulation_lock);
-    running = data->is_simulation_running;
-    pthread_mutex_unlock(&data->simulation_lock);
-    return (running);
-}
 
 void print_action(t_philosopher *philo, char *action)
 {
