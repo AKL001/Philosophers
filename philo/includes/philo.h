@@ -70,6 +70,7 @@ int	ft_atoi(const char *src);
 void	ft_putstr_fd(char *s, int fd);
 int	is_numeric(const char *str);
 
-
+/* CLEANUP */
+void cleanup(t_data *data);
 
 #endif

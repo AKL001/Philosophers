@@ -37,10 +37,14 @@ void start_simulation(t_data *data)
     while(++i < data->num_philos)
         data->philos[i].last_meal_time = data->start_time;
     if (philos_threads(data))
-        return ;
+        return (cleanup(data));
     if (pthread_create(&monitor, NULL, monitor_threads, data) != 0)
     {
-        printf("failed to create monitor thread\n");
+        ft_putstr_fd("failed to create monitor thread\n",2);
+        stop_simulation(data);
+        while (++i < data->num_philos)
+            pthread_join(data->philos[i].thread, NULL);
+        cleanup(data);
         return ;
     }
     i = -1;
@@ -55,13 +59,11 @@ int main(int argc, char **argv)
 
     if (argc == 5 || argc == 6)
     {
-        if (init_all(&data, argc, argv) != 0)
-        {
-            // cleanup(&data);
+        if (init_all(&data, argc, argv))
             return (1);
-        }
         // print_data_state(&data);
         start_simulation(&data);
+        cleanup(&data);
     }
     else {
         ft_putstr_fd("error\n", 2);

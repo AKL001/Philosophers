@@ -6,6 +6,7 @@ SRCS = 	src/main.c \
 		src/utils.c\
 		utils/libft.c\
 		utils/parsing.c\
+		src/cleanup.c
 
 
 OBJS = $(SRCS:.c=.o)
@@ -17,7 +18,7 @@ CFLAGS = -Wall -Wextra -Werror
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	cc $(CFLAGS) $(OBJS) -o $(NAME) -g
+	cc $(CFLAGS) $(OBJS) -o $(NAME) 
 	@make clean	
 # gcc -fsanitize=thread -g 
 # valgrind --tool=helgrind ./philo <args>

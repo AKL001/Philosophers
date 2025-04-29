@@ -30,7 +30,9 @@ int    philos_threads(t_data *data)
     {
         if (pthread_create(&data->philos[i].thread, NULL, philosopher_routine, &data->philos[i]) != 0)
         {
-            printf("Failed to create thread for philosopher %d\n", i);
+            printf("Failed to create thread for philosopher %d\n", i + 1);
+            while(--i >= 0)
+                pthread_detach(data->philos[i].thread);
             return 1;
         }
         i++;
