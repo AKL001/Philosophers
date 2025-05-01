@@ -36,9 +36,10 @@ void *philosopher_routine(void *arg)
 {
     t_philosopher *philo = (t_philosopher *)arg;
 
+    while (get_time_in_ms() < philo->data->start_time)
+        continue;
     if (philo->data->num_philos == 1)
     {
-        print_action(philo, "is thinking");
         pthread_mutex_lock(philo->left_fork);
         print_action(philo, "has taken a fork");
         smart_sleep(philo->data->time_to_die, philo->data);
@@ -53,8 +54,13 @@ void *philosopher_routine(void *arg)
     {
         take_forks(philo);
         eat(philo);
-        put_down_forks(philo);
+        if (put_down_forks(philo))
+            break ;
+        // if (!is_simulation_running(philo->data))
+        //     break ;
         ft_sleep(philo);
+        // if (!is_simulation_running(philo->data))
+        //     break ;
         think(philo);
     }
     return (NULL);

@@ -38,6 +38,7 @@ int all_philos_ate(t_data *data)
         }
     }
     pthread_mutex_unlock(&data->meal_lock);
+
     return (all_ate);
 }
 int someone_died(t_data *data)
@@ -78,7 +79,7 @@ void *monitor_threads(void *arg)
             stop_simulation(data);
             break;
         }
-        usleep(1000);
+        usleep(500);
     }
     return (NULL);
 }

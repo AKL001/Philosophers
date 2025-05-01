@@ -2,28 +2,36 @@
 #include <pthread.h>
 
 
-void put_down_forks(t_philosopher *philo)
+int put_down_forks(t_philosopher *philo)
 {
     pthread_mutex_unlock(philo->left_fork);
     pthread_mutex_unlock(philo->right_fork);
+
+    pthread_mutex_lock(&philo->data->meal_lock);
+    if (philo->meals_eaten != 0
+        && philo->meals_eaten == philo->data->max_meals)
+    {
+        pthread_mutex_unlock(&philo->data->meal_lock);
+        return (1);
+    }
+    pthread_mutex_unlock(&philo->data->meal_lock);
+    return (0);
 }
 
 void think(t_philosopher *philo)
 {
     long long time_to_think;
     
-    if(philo->data->is_simulation_running == 0)
-        return;
-    print_action(philo,"is thinking");
     pthread_mutex_lock(&philo->data->meal_lock);
     time_to_think = (philo->data->time_to_die - 
                     (get_time_in_ms() - philo->last_meal_time)) / 2;
     pthread_mutex_unlock(&philo->data->meal_lock);
     
-    if (time_to_think < 10)
-        time_to_think = 10;
+    if (time_to_think < 0)
+        time_to_think = 0;
     if (time_to_think > 200)
         time_to_think = 200;
+    print_action(philo,"is thinking");
     smart_sleep(time_to_think, philo->data);
 }
 

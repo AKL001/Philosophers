@@ -27,6 +27,7 @@ void print_data_state(t_data *data)
     }
 }
 
+
 void start_simulation(t_data *data)
 {
     pthread_t monitor;

@@ -3,7 +3,7 @@
 
 int	valid_philo_num(const char *arg)
 {
-	if (!is_numeric(arg) || ft_atoi(arg) <= 0)
+	if (ft_atoi(arg) <= 0)
 	{
 		ft_putstr_fd("Error: Invalid number of philosophers argument\n", 2);
 		return (1);
@@ -13,7 +13,7 @@ int	valid_philo_num(const char *arg)
 
 int	valid_ms(const char *arg)
 {
-	if (!is_numeric(arg) || ft_atoi(arg) <= 0)
+	if (ft_atoi(arg) <= 0)
 	{
 		ft_putstr_fd("Error: Invalid number of ms argument\n", 2);
 		return (1);
@@ -23,7 +23,7 @@ int	valid_ms(const char *arg)
 
 int	valid_must_eat(const char *arg)
 {
-	if (!is_numeric(arg) || ft_atoi(arg) <= 0)
+	if (ft_atoi(arg) <= 0)
 	{
 		ft_putstr_fd("Error: Invalid number of must eat argument\n", 2);
 		return (1);

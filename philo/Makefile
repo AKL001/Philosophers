@@ -13,8 +13,8 @@ OBJS = $(SRCS:.c=.o)
 
 NAME = philo
 
-CFLAGS = -Wall -Wextra -Werror
-
+CFLAGS = -Wall -Wextra -Werror -pthread -fsanitize=thread 
+# -pthread -fsanitize=thread 
 all: $(NAME)
 
 $(NAME): $(OBJS)

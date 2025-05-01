@@ -49,9 +49,9 @@ void smart_sleep(long long duration, t_data *data);
 void stop_simulation(t_data *data);
 
 /* ACTIONS */
-void eat(t_philosopher *philo);
+void       eat(t_philosopher *philo);
 void    take_forks(t_philosopher *philo);
-void put_down_forks(t_philosopher *philo);
+int     put_down_forks(t_philosopher *philo);
 void *philosopher_routine(void *arg);
 void think(t_philosopher *philo);
 // void better_sleep(long long time);
