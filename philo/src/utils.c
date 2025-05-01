@@ -1,41 +1,53 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ablabib <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/01 22:45:11 by ablabib           #+#    #+#             */
+/*   Updated: 2025/05/01 22:45:12 by ablabib          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 // Functions for picking up forks, eating, sleeping, thinking
 #include "../includes/philo.h"
 
-
-long long get_time_in_ms(void)
+long long	get_time_in_ms(void)
 {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return (tv.tv_sec * 1000LL) + (tv.tv_usec / 1000);
+	struct timeval	tv;
+
+	gettimeofday(&tv, NULL);
+	return ((tv.tv_sec * 1000LL) + (tv.tv_usec / 1000));
 }
 
-
-
-void print_action(t_philosopher *philo, char *action)
+void	print_action(t_philosopher *philo, char *action)
 {
-    pthread_mutex_lock(&philo->data->print_lock);
-    if (is_simulation_running(philo->data))
-    {
-        printf("%lld %d %s\n", get_time_in_ms() - philo->data->start_time, philo->id, action);
-    }
-    pthread_mutex_unlock(&philo->data->print_lock);
+	pthread_mutex_lock(&philo->data->print_lock);
+	if (is_simulation_running(philo->data))
+	{
+		printf("%lld %d %s\n", get_time_in_ms() - philo->data->start_time,
+			philo->id, action);
+	}
+	pthread_mutex_unlock(&philo->data->print_lock);
 }
 
-int    philos_threads(t_data *data)
+int	philos_threads(t_data *data)
 {
-    int i;
+	int	i;
 
-    i = 0;
-    while(i < data->num_philos)
-    {
-        if (pthread_create(&data->philos[i].thread, NULL, philosopher_routine, &data->philos[i]) != 0)
-        {
-            printf("Failed to create thread for philosopher %d\n", i + 1);
-            while(--i >= 0)
-                pthread_detach(data->philos[i].thread);
-            return 1;
-        }
-        i++;
-    }
-    return 0;
+	i = 0;
+	while (i < data->num_philos)
+	{
+		if (pthread_create(&data->philos[i].thread, NULL, philosopher_routine,
+				&data->philos[i]) != 0)
+		{
+			printf("Failed to create thread for philosopher %d\n", i + 1);
+			while (--i >= 0)
+				pthread_detach(data->philos[i].thread);
+			return (1);
+		}
+		i++;
+	}
+	return (0);
 }
