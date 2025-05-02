@@ -1,4 +1,0 @@
-after philo dies it hangs ??
-    test -> ./philo 2 100 200 200 
-    *fixed*
-    
