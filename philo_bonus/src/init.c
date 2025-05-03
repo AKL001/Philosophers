@@ -36,6 +36,7 @@ int	init_semaphores(t_data *data)
 	data->all_ate = sem_open(SEM_ALL_ATE, O_CREAT, 0644, 0);
 	if (data->all_ate == SEM_FAILED)
 		return (1);
+
 	return (0);
 }
 
@@ -72,15 +73,15 @@ int	init_all(t_data *data, int argc, char **argv)
 	if (init_semaphores(data))
 	{
 		ft_putstr_fd("Error: Failed to initialize semaphores\n", 2);
-		// close_semaphores(data);
-		// unlink_semaphores();
+		close_semaphores(data);
+		unlink_semaphores();
 		return (1);
 	}
 	if (init_philosophers(data))
 	{
 		ft_putstr_fd("Error: Failed to initialize philosophers\n", 2);
-		// close_semaphores(data);
-		// unlink_semaphores();
+		close_semaphores(data);
+		unlink_semaphores();
 		return (1);
 	}
 	return (0);

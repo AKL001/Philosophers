@@ -1,4 +1,5 @@
 #include "../includes/philo_bonus.h"
+#include <string.h>
 
 void	*monitor_routine(void *arg)
 {
@@ -12,17 +13,21 @@ void	*monitor_routine(void *arg)
 		time_since_last_meal = get_time_in_ms() - philo->last_meal_time;
 		if (time_since_last_meal > philo->data->time_to_die)
 		{
+			// post for death 
+			sem_post(philo->data->meal_check);
+
+			sem_post(philo->data->dead);
+			// we need a simulation semaphore 
+			philo->data->is_simulation_running = 0;
+
 			sem_wait(philo->data->print);
 			printf("%lld %d died\n",
 				get_time_in_ms() - philo->data->start_time, philo->id);
-            // sem_post(philo->data->print);
-			philo->data->is_simulation_running = 0;
-			sem_post(philo->data->dead);
-			sem_post(philo->data->meal_check);
+            sem_post(philo->data->print);
 			return (NULL);
 		}
 		sem_post(philo->data->meal_check);
-		usleep(1000);
+		usleep(500);
 	}
 	return (NULL);
 }
@@ -32,18 +37,21 @@ void	*meal_monitor_routine(void *arg)
 	t_data	*data;
 	int		i;
 
+
 	data = (t_data *)arg;
+	if (data->max_meals == 0)
+		return (NULL);
 	i = 0;
 	while (i < data->num_philos && is_simulation_running(data))
 	{
 		sem_wait(data->all_ate);
 		i++;
 	}
-	if (i == data->num_philos)
-	{
-		data->is_simulation_running = 0;
-		sem_post(data->dead);
-	}
+	if (i == data->num_philos && is_simulation_running(data))
+    {
+        data->is_simulation_running = 0;
+        sem_post(data->dead);
+    }
 	return (NULL);
 }
 
@@ -53,6 +61,7 @@ int	start_processes(t_data *data)
 	pthread_t	meal_monitor;
 
 	i = 0;
+	// memset(&meal_monitor,0,sizeof(pthread_t));
 	if (data->max_meals > 0)
 	{
 		if (pthread_create(&meal_monitor, NULL, meal_monitor_routine, data))
@@ -78,6 +87,9 @@ int	start_processes(t_data *data)
 void	wait_for_processes(t_data *data)
 {
 	sem_wait(data->dead);
+	// printf("wait all proc\n");
+	// printf("sem wait [%d]\n",*((int *)data->dead));
 	data->is_simulation_running = 0;
+
 	kill_processes(data);
 }

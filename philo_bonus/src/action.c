@@ -11,8 +11,8 @@ void	think(t_philo *philo)
 	long long	time_to_think;
 	long long	time_since_last_meal;
 
-	// if (!is_simulation_running(philo->data))
-	// 	return ;
+	if (!is_simulation_running(philo->data))
+		return ;
 	print_action(philo, "is thinking");
 	sem_wait(philo->data->meal_check);
 	time_since_last_meal = get_time_in_ms() - philo->last_meal_time;
@@ -35,12 +35,12 @@ void	ft_sleep(t_philo *philo)
 
 void	eat(t_philo *philo)
 {
-	// if (!is_simulation_running(philo->data))
-	// 	return ;
+	if (!is_simulation_running(philo->data))
+		return ;
 	sem_wait(philo->data->meal_check);
 	philo->last_meal_time = get_time_in_ms();
+	print_action(philo, "\033[1;32mis eating\033[0m");
 	philo->meals_eaten++;
-	print_action(philo, "is eating");
 	if (philo->data->max_meals != -1
 		&& philo->meals_eaten >= philo->data->max_meals)
 		sem_post(philo->data->all_ate);
@@ -54,25 +54,4 @@ void	take_forks(t_philo *philo)
 	print_action(philo, "has taken a fork");
 	sem_wait(philo->data->forks);
 	print_action(philo, "has taken a fork");
-}
-
-void	philosopher_routine(t_philo *philo)
-{
-	pthread_t	monitor_thread;
-
-	philo->last_meal_time = get_time_in_ms();
-	if (pthread_create(&monitor_thread, NULL, monitor_routine, philo))
-		exit(1);
-	// pthread_detach(monitor_thread);
-	if (philo->id % 2 == 0)
-		usleep(1000);
-	while (is_simulation_running(philo->data))
-	{
-		take_forks(philo);
-		eat(philo);
-		put_down_forks(philo);
-		ft_sleep(philo);
-		think(philo);
-	}
-	exit(0);
 }

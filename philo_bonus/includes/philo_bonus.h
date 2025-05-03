@@ -18,6 +18,7 @@
 # define SEM_PRINT "/sem_print"
 # define SEM_MEAL_CHECK "/sem_meal_check"
 # define SEM_DEAD "/sem_dead"
+// # define IS_SIMULATION "/sem_is_simulation"
 # define SEM_ALL_ATE "/sem_all_ate"
 
 typedef struct s_philo
@@ -70,6 +71,13 @@ void	smart_sleep(long long duration, t_data *data);
 
 /* PHILO  ROUTINE */
 void	philosopher_routine(t_philo *philo);
+
+/* ACTIONS */
+void	think(t_philo *philo);
+void		put_down_forks(t_philo *philo);
+void	ft_sleep(t_philo *philo);
+void	eat(t_philo *philo);
+void	take_forks(t_philo *philo);
 
 
 /* MONITORING */

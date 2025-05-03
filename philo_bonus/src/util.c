@@ -17,6 +17,6 @@ void	smart_sleep(long long duration, t_data *data)
 	{
 		if (get_time_in_ms() - start >= duration)
 			break ;
-		usleep(100);
+		usleep(500);
 	}
 }
