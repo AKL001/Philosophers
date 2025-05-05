@@ -18,8 +18,17 @@
 # define SEM_PRINT "/sem_print"
 # define SEM_MEAL_CHECK "/sem_meal_check"
 # define SEM_DEAD "/sem_dead"
+# define SEM_DONE "/sem_done"
+#define SEM_SIM_STATUS "/sem_sim_status"
 // # define IS_SIMULATION "/sem_is_simulation"
 # define SEM_ALL_ATE "/sem_all_ate"
+# define SEM_DONE_PREFIX "/sem_done_"
+
+typedef struct s_sem
+{
+	sem_t	ptr;
+	char	*name;
+}				t_sem;
 
 typedef struct s_philo
 {
@@ -27,6 +36,9 @@ typedef struct s_philo
 	int				meals_eaten;
 	long long		last_meal_time;
 	pid_t			pid;
+	// t_sem			done;
+	sem_t			*done;
+	char 			done_sem_name[250];
 	struct s_data	*data;
 }					t_philo;
 
@@ -39,10 +51,13 @@ typedef struct s_data
 	int				max_meals;
 	int				is_simulation_running;
 	long long		start_time;
+	int 			meal_monitor_running;
+	pthread_t 		meal_monitor_tid;
 	sem_t			*forks;
 	sem_t			*print;
 	sem_t			*meal_check;
 	sem_t			*dead;
+	sem_t *sim_status;
 	sem_t			*all_ate;
 	t_philo			*philos;
 	pid_t			*pids;
@@ -63,6 +78,9 @@ int	ft_atoi(const char *src);
 size_t	ft_strlen(const char *s);
 int	is_numeric(const char *str);
 int	ft_isdigit(int c);
+size_t	ft_strlcpy(char *dst, const char *src, size_t len);
+char	*ft_strjoin(char const *s1, char const *s2);
+char	*ft_itoa(int nbr);
 
 /* UTILS */
 long long	get_time_in_ms(void);
@@ -90,6 +108,10 @@ void	kill_processes(t_data *data);
 void	unlink_semaphores(void);
 void	close_semaphores(t_data *data);
 void	cleanup(t_data *data);
+void stop_simulation(t_data *data);
+
+/* LIBFT */
+
 
 
 #endif

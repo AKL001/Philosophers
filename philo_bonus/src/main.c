@@ -4,7 +4,9 @@ int	is_simulation_running(t_data *data)
 {
 	int	running;
 
+	sem_wait(data->sim_status);
 	running = data->is_simulation_running;
+	sem_post(data->sim_status);
 	return (running);
 }
 

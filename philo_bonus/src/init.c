@@ -1,4 +1,5 @@
 #include "../includes/philo_bonus.h"
+#include <string.h>
 
 int	valid_arguments(int argc, char **argv, t_data *data)
 {
@@ -20,6 +21,8 @@ int	valid_arguments(int argc, char **argv, t_data *data)
 
 int	init_semaphores(t_data *data)
 {
+	// int i;
+
 	unlink_semaphores();
 	data->forks = sem_open(SEM_FORKS, O_CREAT, 0644, data->num_philos);
 	if (data->forks == SEM_FAILED)
@@ -33,16 +36,25 @@ int	init_semaphores(t_data *data)
 	data->dead = sem_open(SEM_DEAD, O_CREAT, 0644, 0);
 	if (data->dead == SEM_FAILED)
 		return (1);
-	data->all_ate = sem_open(SEM_ALL_ATE, O_CREAT, 0644, 0);
-	if (data->all_ate == SEM_FAILED)
+	// init simulation 
+	data->sim_status = sem_open(SEM_SIM_STATUS, O_CREAT, 0644, 1);
+	if (data->sim_status == SEM_FAILED)
 		return (1);
-
+	if (data->max_meals != -1)
+	{
+		data->all_ate = sem_open(SEM_ALL_ATE, O_CREAT, 0644, 0);
+		if (data->all_ate == SEM_FAILED)
+			return (1);
+	}
+	
 	return (0);
 }
 
 int	init_philosophers(t_data *data)
 {
 	int	i;
+	char *temp;
+	char *id_str;
 
 	data->philos = malloc(sizeof(t_philo) * data->num_philos);
 	if (!data->philos)
@@ -53,6 +65,7 @@ int	init_philosophers(t_data *data)
 		free(data->philos);
 		return (1);
 	}
+	sem_unlink(SEM_DONE);
 	i = 0;
 	while (i < data->num_philos)
 	{
@@ -60,14 +73,46 @@ int	init_philosophers(t_data *data)
 		data->philos[i].meals_eaten = 0;
 		data->philos[i].last_meal_time = 0;
 		data->philos[i].data = data;
+		// strjoin the sema name with i ;
+		// ft_strjoin(SEM_DONE_PREFIX, i);
+		// Join prefix with index using ft_strjoin
+		id_str = ft_itoa(i);
+        if (!id_str)
+            return (1);	
+        temp = ft_strjoin(SEM_DONE_PREFIX, id_str);
+		free(id_str);
+        if (!temp)
+            return (1);
+        // Copy the joined string to the done_sem_name field
+        ft_strlcpy(data->philos[i].done_sem_name, temp, sizeof(data->philos[i].done_sem_name));
+        free(temp); 
+
+        sem_unlink(data->philos[i].done_sem_name);  // Ensure it's unlinked first
+        
+        if (data->max_meals != -1)
+        {
+            data->philos[i].done = sem_open(data->philos[i].done_sem_name, O_CREAT, 0644, 0);
+            if (data->philos[i].done == SEM_FAILED)
+                return (1);
+        }
 		i++;
 	}
+	// if (data->max_meals != -1)
+	// {
+	// 	i = -1;
+	// 	while(++i < data->num_philos)
+	// 	{
+	// 		data->philos[i].done = sem_open(SEM_DONE, O_CREAT, 0644 , 0);
+	// 		if (data->philos[i].done == SEM_FAILED)
+	// 			return 1;
+	// 	}
+	// }
 	return (0);
 }
 
 int	init_all(t_data *data, int argc, char **argv)
 {
-	// ft_memset(data, 0, sizeof(t_data));
+	memset(data, 0, sizeof(t_data));
 	if (valid_arguments(argc, argv, data))
 		return (1);
 	if (init_semaphores(data))

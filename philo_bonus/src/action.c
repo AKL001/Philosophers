@@ -43,7 +43,7 @@ void	eat(t_philo *philo)
 	philo->meals_eaten++;
 	if (philo->data->max_meals != -1
 		&& philo->meals_eaten >= philo->data->max_meals)
-		sem_post(philo->data->all_ate);
+		sem_post(philo->done);
 	sem_post(philo->data->meal_check);
 	smart_sleep(philo->data->time_to_eat, philo->data);
 }
