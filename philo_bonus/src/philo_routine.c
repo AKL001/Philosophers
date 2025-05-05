@@ -13,7 +13,7 @@ void	philosopher_routine(t_philo *philo)
 	pthread_detach(monitor_thread);
 	// pthread_join(monitor_thread, NULL);
 	if (philo->id % 2 == 0)
-		usleep(1000);
+		usleep(700);
 	while (is_simulation_running(philo->data))
 	{
 		take_forks(philo);

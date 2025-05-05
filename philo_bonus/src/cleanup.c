@@ -78,7 +78,7 @@ void	cleanup(t_data *data)
     sem_post(data->sim_status);
     
 	if (data->max_meals != -1)
-		unblock_meal_monitor(data);		
+		unblock_meal_monitor(data);			
     // usleep(10000);
 	if (data->max_meals != -1 && data->meal_monitor_tid)
     {
@@ -94,10 +94,15 @@ void	cleanup(t_data *data)
 	if (data->pids)
 		free(data->pids);
 	data->philos = NULL;
-	data->pids = NULL;
+	data->pids = NULL;	
 	close_semaphores(data);
-	int i = -1;
-	while(++i < data->num_philos)
-		sem_unlink(data->philos[i].done_sem_name);
+
+	if (data->philos) {
+		for (int i = 0; i < data->num_philos; i++) {
+			if (data->philos[i].done_sem_name[0] != '\0') {
+				sem_unlink(data->philos[i].done_sem_name);
+			}
+		}
+	}
 	unlink_semaphores();
 }

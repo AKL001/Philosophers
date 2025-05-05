@@ -50,14 +50,15 @@ typedef struct s_data
 	int				time_to_sleep;
 	int				max_meals;
 	int				is_simulation_running;
-	long long		start_time;
 	int 			meal_monitor_running;
+	long long		start_time;
 	pthread_t 		meal_monitor_tid;
+	pthread_t		is_dead_monitor_tid;
 	sem_t			*forks;
 	sem_t			*print;
 	sem_t			*meal_check;
 	sem_t			*dead;
-	sem_t *sim_status;
+	sem_t 			*sim_status;
 	sem_t			*all_ate;
 	t_philo			*philos;
 	pid_t			*pids;

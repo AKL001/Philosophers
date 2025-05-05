@@ -73,6 +73,8 @@ int	init_philosophers(t_data *data)
 		data->philos[i].meals_eaten = 0;
 		data->philos[i].last_meal_time = 0;
 		data->philos[i].data = data;
+		data->philos[i].done = NULL;  // Initialize to NULL for safety
+		data->philos[i].done_sem_name[0] = '\0'; 
 		// strjoin the sema name with i ;
 		// ft_strjoin(SEM_DONE_PREFIX, i);
 		// Join prefix with index using ft_strjoin
@@ -127,6 +129,10 @@ int	init_all(t_data *data, int argc, char **argv)
 		ft_putstr_fd("Error: Failed to initialize philosophers\n", 2);
 		close_semaphores(data);
 		unlink_semaphores();
+		if (data->philos)
+			free(data->philos);
+		if (data->pids)
+			free(data->pids);
 		return (1);
 	}
 	return (0);

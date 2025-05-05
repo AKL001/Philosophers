@@ -6,7 +6,7 @@ void stop_simulation(t_data *data)
     sem_wait(data->sim_status);
     data->is_simulation_running = 0;
     sem_post(data->sim_status);
-    sem_post(data->dead);  // Signal to main process
+    sem_post(data->dead); 
 }
 
 void	*monitor_routine(void *arg)
@@ -19,13 +19,13 @@ void	*monitor_routine(void *arg)
 	{
 		sem_wait(philo->data->meal_check);
 		time_since_last_meal = get_time_in_ms() - philo->last_meal_time;
-		sem_post(philo->data->meal_check);
+
 		if (time_since_last_meal > philo->data->time_to_die)
 		{
 			sem_wait(philo->data->print);
-            printf("%lld %d died\n",
-                get_time_in_ms() - philo->data->start_time, philo->id);
-            
+            printf("\033[0;31m%lld %d died\033[0m\n",
+				get_time_in_ms() - philo->data->start_time, philo->id);
+		 
             // Now stop simulation
             sem_wait(philo->data->sim_status);
             philo->data->is_simulation_running = 0;
@@ -33,9 +33,9 @@ void	*monitor_routine(void *arg)
             
             // Signal main process about death
             sem_post(philo->data->dead);
-
-			exit(1);
-			// return (NULL);
+			sem_post(philo->data->meal_check);
+			// exit(1);
+			return (NULL);
 		}
 		sem_post(philo->data->meal_check);
 		usleep(500);
@@ -81,6 +81,9 @@ int	start_processes(t_data *data)
 	int			i;
 	pthread_t	meal_monitor;
 
+	data->start_time = get_time_in_ms();
+	// printf("-----starting  time is [%lld]\n",get_time_in_ms() - data->start_time);
+
 	for (int j = 0; j < data->num_philos; j++)
 		data->philos[j].last_meal_time = get_time_in_ms();
 // memset(&meal_monitor,0,sizeof(pthread_t));
@@ -90,6 +93,7 @@ int	start_processes(t_data *data)
 	// 		return (1);
 	// 	pthread_detach(meal_monitor);
 	// }
+
 	i = 0;
 	while (i < data->num_philos)
 	{
