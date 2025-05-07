@@ -9,10 +9,10 @@
 #include <fcntl.h>         
 #include <sys/stat.h>
 #include <semaphore.h>
-# include <pthread.h>
-# include <sys/time.h>
- #include <signal.h>
- #include <sys/wait.h>
+#include <pthread.h>
+#include <sys/time.h>
+#include <signal.h>
+#include <sys/wait.h>
 
 # define SEM_FORKS "/sem_forks"
 # define SEM_PRINT "/sem_print"
