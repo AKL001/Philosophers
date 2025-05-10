@@ -20,6 +20,7 @@
 # define SEM_DEAD "/sem_dead"
 # define SEM_DONE "/sem_done"
 #define SEM_SIM_STATUS "/sem_sim_status"
+# define SEM_SYNC "/sem_sync"
 // # define IS_SIMULATION "/sem_is_simulation"
 # define SEM_ALL_ATE "/sem_all_ate"
 # define SEM_DONE_PREFIX "/sem_done_"
@@ -54,12 +55,14 @@ typedef struct s_data
 	long long		start_time;
 	pthread_t 		meal_monitor_tid;
 	pthread_t		is_dead_monitor_tid;
+	
 	sem_t			*forks;
 	sem_t			*print;
 	sem_t			*meal_check;
 	sem_t			*dead;
 	sem_t 			*sim_status;
 	sem_t			*all_ate;
+	sem_t 			*sync;
 	t_philo			*philos;
 	pid_t			*pids;
 }					t_data;

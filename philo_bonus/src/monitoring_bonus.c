@@ -25,14 +25,8 @@ void	*monitor_routine(void *arg)
 			sem_wait(philo->data->print);
             printf("\033[0;31m%lld %d died\033[0m\n",
 				get_time_in_ms() - philo->data->start_time, philo->id);
-		 
-            // Now stop simulation
-            sem_wait(philo->data->sim_status);
-            philo->data->is_simulation_running = 0;
-            sem_post(philo->data->sim_status);
-            
-            // Signal main process about death
-            sem_post(philo->data->dead);
+			
+			stop_simulation(philo->data);
 			sem_post(philo->data->meal_check);
 			// exit(1);
 			return (NULL);
@@ -82,18 +76,9 @@ int	start_processes(t_data *data)
 	pthread_t	meal_monitor;
 
 	data->start_time = get_time_in_ms();
-	// printf("-----starting  time is [%lld]\n",get_time_in_ms() - data->start_time);
-
-	for (int j = 0; j < data->num_philos; j++)
-		data->philos[j].last_meal_time = get_time_in_ms();
-// memset(&meal_monitor,0,sizeof(pthread_t));
-// if (data->max_meals > 0)
-// {
-	// 	if (pthread_create(&meal_monitor, NULL, meal_monitor_routine, data))
-	// 		return (1);
-	// 	pthread_detach(meal_monitor);
-	// }
-
+	i = -1;
+	while(++i < data->num_philos)
+		sem_post(data->sync); 
 	i = 0;
 	while (i < data->num_philos)
 	{
@@ -108,13 +93,17 @@ int	start_processes(t_data *data)
 		data->pids[i] = data->philos[i].pid;
 		i++;
 	}
+
+	i = -1;
+	while(++i < data->num_philos)
+		data->philos[i].last_meal_time = get_time_in_ms();
+		
 	if (data->max_meals > 0)
 	{
 		data->meal_monitor_running = 1;
 		if (pthread_create(&meal_monitor, NULL, meal_monitor_routine, data))
 			return (1);
 		data->meal_monitor_tid = meal_monitor;
-		// // pthread_detach(meal_monitor);
         // data->meal_monitor_tid = 0;
 	}
 	return (0);
@@ -123,14 +112,8 @@ int	start_processes(t_data *data)
 void	wait_for_processes(t_data *data)
 {
 	sem_wait(data->dead);
-	// printf("wait all proc\n");
-	// printf("sem wait [%d]\n",*((int *)data->dead));
-	// data->is_simulation_running = 0;
 	sem_wait(data->sim_status);
     data->is_simulation_running = 0;
     sem_post(data->sim_status);
-
 	kill_processes(data);
-
-	// usleep(10000);
 }

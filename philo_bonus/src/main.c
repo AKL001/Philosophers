@@ -1,4 +1,5 @@
 #include "../includes/philo_bonus.h"
+#include <string.h>
 
 int	is_simulation_running(t_data *data)
 {
@@ -18,10 +19,8 @@ void	print_action(t_philo *philo, char *action)
 	if (!philo || !philo->data || !is_simulation_running(philo->data) || !philo->data->print)
 		return;
 	sem_wait(philo->data->print);
-
 	timestamp = get_time_in_ms() - philo->data->start_time;
 	printf("%lld %d %s\n", timestamp, philo->id, action);
-
 	sem_post(philo->data->print);
 }
 
@@ -35,15 +34,16 @@ void	start_simulation(t_data *data)
 		cleanup(data);
 		return ;
 	}
+	
 	wait_for_processes(data);
-	cleanup(data);
 }
 
 int	main(int argc, char **argv)
 {
 	t_data	data;
 
-	// ft_memset(&data, 0, sizeof(t_data));
+	memset(&data, 0, sizeof(t_data));
+
 	if (argc != 5 && argc != 6)
 	{
 		printf("Usage: ./philo_bonus num_philos time_to_die ");
@@ -56,5 +56,6 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	start_simulation(&data);
+	cleanup(&data);
 	return (0);
 }

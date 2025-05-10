@@ -24,6 +24,11 @@ int	init_semaphores(t_data *data)
 	// int i;
 
 	unlink_semaphores();
+	// sem_unlink(SEM_SYNC);
+	data->sync = sem_open(SEM_SYNC, O_CREAT, 0644, 0);
+	if (data->sync == SEM_FAILED)
+		return 1;
+		
 	data->forks = sem_open(SEM_FORKS, O_CREAT, 0644, data->num_philos);
 	if (data->forks == SEM_FAILED)
 		return (1);
@@ -50,11 +55,35 @@ int	init_semaphores(t_data *data)
 	return (0);
 }
 
+static int	setup_philo_done_sem(t_data *data, int i)
+{
+	char	*id_str;
+	char	*temp;
+
+	id_str = ft_itoa(i);
+	if (!id_str)
+		return (1);
+	temp = ft_strjoin(SEM_DONE_PREFIX, id_str);
+	free(id_str);
+	if (!temp)
+		return (1);
+	ft_strlcpy(data->philos[i].done_sem_name, temp,
+		sizeof(data->philos[i].done_sem_name));
+	free(temp);
+	sem_unlink(data->philos[i].done_sem_name);
+	if (data->max_meals != -1)
+	{
+		data->philos[i].done = sem_open(data->philos[i].done_sem_name,
+				O_CREAT, 0644, 0);
+		if (data->philos[i].done == SEM_FAILED)
+			return (1);
+	}
+	return (0);
+}
+
 int	init_philosophers(t_data *data)
 {
-	int	i;
-	char *temp;
-	char *id_str;
+	int		i;
 
 	data->philos = malloc(sizeof(t_philo) * data->num_philos);
 	if (!data->philos)
@@ -65,7 +94,6 @@ int	init_philosophers(t_data *data)
 		free(data->philos);
 		return (1);
 	}
-	sem_unlink(SEM_DONE);
 	i = 0;
 	while (i < data->num_philos)
 	{
@@ -73,44 +101,76 @@ int	init_philosophers(t_data *data)
 		data->philos[i].meals_eaten = 0;
 		data->philos[i].last_meal_time = 0;
 		data->philos[i].data = data;
-		data->philos[i].done = NULL;  // Initialize to NULL for safety
-		data->philos[i].done_sem_name[0] = '\0'; 
-		// strjoin the sema name with i ;
-		// ft_strjoin(SEM_DONE_PREFIX, i);
-		// Join prefix with index using ft_strjoin
-		id_str = ft_itoa(i);
-        if (!id_str)
-            return (1);	
-        temp = ft_strjoin(SEM_DONE_PREFIX, id_str);
-		free(id_str);
-        if (!temp)
-            return (1);
-        // Copy the joined string to the done_sem_name field
-        ft_strlcpy(data->philos[i].done_sem_name, temp, sizeof(data->philos[i].done_sem_name));
-        free(temp); 
-
-        sem_unlink(data->philos[i].done_sem_name);  // Ensure it's unlinked first
-        
-        if (data->max_meals != -1)
-        {
-            data->philos[i].done = sem_open(data->philos[i].done_sem_name, O_CREAT, 0644, 0);
-            if (data->philos[i].done == SEM_FAILED)
-                return (1);
-        }
+		data->philos[i].done = NULL;
+		data->philos[i].done_sem_name[0] = '\0';
+		if (setup_philo_done_sem(data, i))
+			return (1);
 		i++;
 	}
-	// if (data->max_meals != -1)
-	// {
-	// 	i = -1;
-	// 	while(++i < data->num_philos)
-	// 	{
-	// 		data->philos[i].done = sem_open(SEM_DONE, O_CREAT, 0644 , 0);
-	// 		if (data->philos[i].done == SEM_FAILED)
-	// 			return 1;
-	// 	}
-	// }
 	return (0);
 }
+
+// int	init_philosophers(t_data *data)
+// {
+// 	int	i;
+// 	char *temp;
+// 	char *id_str;
+
+// 	data->philos = malloc(sizeof(t_philo) * data->num_philos);
+// 	if (!data->philos)
+// 		return (1);
+// 	data->pids = malloc(sizeof(pid_t) * data->num_philos);
+// 	if (!data->pids)
+// 	{
+// 		free(data->philos);
+// 		return (1);
+// 	}
+// 	sem_unlink(SEM_DONE);
+// 	i = 0;
+// 	while (i < data->num_philos)
+// 	{
+// 		data->philos[i].id = i + 1;
+// 		data->philos[i].meals_eaten = 0;
+// 		data->philos[i].last_meal_time = 0;
+// 		data->philos[i].data = data;
+// 		data->philos[i].done = NULL;
+// 		data->philos[i].done_sem_name[0] = '\0'; 
+// 		// strjoin the sema name with i ;
+// 		// ft_strjoin(SEM_DONE_PREFIX, i);
+// 		// Join prefix with index using ft_strjoin
+// 		id_str = ft_itoa(i);
+//         if (!id_str)
+//             return (1);	
+//         temp = ft_strjoin(SEM_DONE_PREFIX, id_str);
+// 		free(id_str);
+//         if (!temp)
+//             return (1);
+//         // Copy the joined string to the done_sem_name field
+//         ft_strlcpy(data->philos[i].done_sem_name, temp, sizeof(data->philos[i].done_sem_name));
+//         free(temp); 
+
+//         sem_unlink(data->philos[i].done_sem_name);  // Ensure it's unlinked first
+        
+//         if (data->max_meals != -1)
+//         {
+//             data->philos[i].done = sem_open(data->philos[i].done_sem_name, O_CREAT, 0644, 0);
+//             if (data->philos[i].done == SEM_FAILED)
+//                 return (1);
+//         }
+// 		i++;
+// 	}
+// 	// if (data->max_meals != -1)
+// 	// {
+// 	// 	i = -1;
+// 	// 	while(++i < data->num_philos)
+// 	// 	{
+// 	// 		data->philos[i].done = sem_open(SEM_DONE, O_CREAT, 0644 , 0);
+// 	// 		if (data->philos[i].done == SEM_FAILED)
+// 	// 			return 1;
+// 	// 	}
+// 	// }
+// 	return (0);
+// }
 
 int	init_all(t_data *data, int argc, char **argv)
 {
@@ -129,10 +189,6 @@ int	init_all(t_data *data, int argc, char **argv)
 		ft_putstr_fd("Error: Failed to initialize philosophers\n", 2);
 		close_semaphores(data);
 		unlink_semaphores();
-		if (data->philos)
-			free(data->philos);
-		if (data->pids)
-			free(data->pids);
 		return (1);
 	}
 	return (0);

@@ -7,11 +7,12 @@ void	philosopher_routine(t_philo *philo)
 	int			done;
 
 	done = 0;
+	sem_wait(philo->data->sync);
 	philo->last_meal_time = get_time_in_ms();
 	if (pthread_create(&monitor_thread, NULL, monitor_routine, philo))
 		exit(1);
-	pthread_detach(monitor_thread);
-	// pthread_join(monitor_thread, NULL);
+	// pthread_detach(monitor_thread);
+	philo->data->is_dead_monitor_tid = monitor_thread;
 	if (philo->id % 2 == 0)
 		usleep(700);
 	while (is_simulation_running(philo->data))
@@ -28,18 +29,12 @@ void	philosopher_routine(t_philo *philo)
 		if (done)
         {
             if (philo->data->max_meals > 0)
-                sem_post(philo->done);  // Signal completion
+                sem_post(philo->done);
             break;
         }
-		
 		ft_sleep(philo);
-		
-		// if (is_simulation_running(philo->data))
-		// 	break;
 		think(philo);
-        // if (is_simulation_running(philo->data))
-        //     printf("similation is done\n");
-		
 	}
+	// pthread_join(monitor_thread, NULL);
 	exit(0);
 }

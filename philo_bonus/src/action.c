@@ -29,6 +29,8 @@ void	think(t_philo *philo)
 
 void	ft_sleep(t_philo *philo)
 {
+	if (!is_simulation_running(philo->data))
+		return ;
 	print_action(philo, "is sleeping");
 	smart_sleep(philo->data->time_to_sleep, philo->data);
 }
@@ -50,6 +52,8 @@ void	eat(t_philo *philo)
 
 void	take_forks(t_philo *philo)
 {
+	if (!is_simulation_running(philo->data))
+		return ;
 	sem_wait(philo->data->forks);
 	print_action(philo, "has taken a fork");
 	sem_wait(philo->data->forks);
