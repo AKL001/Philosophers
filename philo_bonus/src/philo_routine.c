@@ -1,20 +1,21 @@
 #include "../includes/philo_bonus.h"
 
-
 void	philosopher_routine(t_philo *philo)
 {
 	pthread_t	monitor_thread;
 	int			done;
 
 	done = 0;
+
 	sem_wait(philo->data->sync);
+	philo->data->start_time = get_time_in_ms();
 	philo->last_meal_time = get_time_in_ms();
 	if (pthread_create(&monitor_thread, NULL, monitor_routine, philo))
 		exit(1);
 	// pthread_detach(monitor_thread);
 	philo->data->is_dead_monitor_tid = monitor_thread;
 	if (philo->id % 2 == 0)
-		usleep(700);
+		usleep(1000);
 	while (is_simulation_running(philo->data))
 	{
 		take_forks(philo);
@@ -30,11 +31,11 @@ void	philosopher_routine(t_philo *philo)
         {
             if (philo->data->max_meals > 0)
                 sem_post(philo->done);
-            break;
+            exit(0);
+			// break;
         }
 		ft_sleep(philo);
 		think(philo);
 	}
-	// pthread_join(monitor_thread, NULL);
 	exit(0);
 }

@@ -26,7 +26,8 @@ void	print_action(t_philo *philo, char *action)
 
 void	start_simulation(t_data *data)
 {
-	// data->start_time = get_time_in_ms();
+	int i;
+	
 	data->is_simulation_running = 1;
 	if (start_processes(data))
 	{
@@ -34,7 +35,9 @@ void	start_simulation(t_data *data)
 		cleanup(data);
 		return ;
 	}
-	
+	i = -1;
+	while (++i < data->num_philos)
+		sem_post(data->sync);
 	wait_for_processes(data);
 }
 

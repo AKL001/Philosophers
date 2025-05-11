@@ -75,10 +75,6 @@ int	start_processes(t_data *data)
 	int			i;
 	pthread_t	meal_monitor;
 
-	data->start_time = get_time_in_ms();
-	i = -1;
-	while(++i < data->num_philos)
-		sem_post(data->sync); 
 	i = 0;
 	while (i < data->num_philos)
 	{
@@ -93,18 +89,13 @@ int	start_processes(t_data *data)
 		data->pids[i] = data->philos[i].pid;
 		i++;
 	}
-
-	i = -1;
-	while(++i < data->num_philos)
-		data->philos[i].last_meal_time = get_time_in_ms();
-		
+	
 	if (data->max_meals > 0)
 	{
 		data->meal_monitor_running = 1;
 		if (pthread_create(&meal_monitor, NULL, meal_monitor_routine, data))
 			return (1);
 		data->meal_monitor_tid = meal_monitor;
-        // data->meal_monitor_tid = 0;
 	}
 	return (0);
 }

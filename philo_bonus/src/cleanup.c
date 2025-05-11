@@ -5,7 +5,7 @@ void	unlink_semaphores(void)
 	sem_unlink(SEM_SYNC);
 	sem_unlink(SEM_FORKS);
 	sem_unlink(SEM_PRINT);
-	sem_unlink(SEM_ALL_ATE);
+	// sem_unlink(SEM_ALL_ATE);
 	sem_unlink(SEM_MEAL_CHECK);
 	sem_unlink(SEM_DEAD);
 	sem_unlink(SEM_SIM_STATUS);
@@ -27,8 +27,8 @@ void	close_semaphores(t_data *data)
 		sem_close(data->dead);
 	if (data->sim_status)
 		sem_close(data->sim_status);
-	if (data->all_ate)
-		sem_close(data->all_ate);
+	// if (data->all_ate)
+	// 	sem_close(data->all_ate);
 	if (data->philos)
 	{
 		i = 0;
@@ -44,14 +44,13 @@ void	close_semaphores(t_data *data)
 void	kill_processes(t_data *data)
 {
 	int	i;
-
-	i = 0;
-	while (i < data->num_philos)
-	{
-		if (data->pids[i] > 0)
-			kill(data->pids[i], SIGTERM);
-		i++;
-	}
+	// i = 0;
+	// while (i < data->num_philos)
+	// {
+	// 	if (data->pids[i] > 0)
+	// 		kill(data->pids[i], SIGTERM);
+	// 	i++;
+	// }
 	i = 0;
 	while (i < data->num_philos)
 	{
