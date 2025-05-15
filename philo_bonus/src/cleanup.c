@@ -89,7 +89,7 @@ void	cleanup(t_data *data)
 
 	if (!data)
 		return ;
-	if (data->max_meals != -1)
+	if (data->max_meals > 0)
 		unblock_meal_monitor(data);
 	if (data->max_meals != -1 && data->meal_monitor_tid)
 		pthread_join(data->meal_monitor_tid, NULL);

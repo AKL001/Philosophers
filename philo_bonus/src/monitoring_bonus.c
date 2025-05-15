@@ -93,7 +93,6 @@ int	start_processes(t_data *data)
 		else if (data->philos[i].pid == 0)
 		{
 			philosopher_routine(&data->philos[i]);
-			exit(0);
 		}
 		data->pids[i] = data->philos[i].pid;
 		i++;

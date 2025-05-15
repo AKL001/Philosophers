@@ -116,6 +116,4 @@ void				close_semaphores(t_data *data);
 void				cleanup(t_data *data);
 void				stop_simulation(t_data *data);
 
-/* LIBFT */
-
 #endif

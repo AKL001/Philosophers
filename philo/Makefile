@@ -13,16 +13,14 @@ OBJS = $(SRCS:.c=.o)
 
 NAME = philo
 
-CFLAGS = -Wall -Wextra -Werror -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror
 # -pthread -fsanitize=thread 
+
 all: $(NAME)
 
 $(NAME): $(OBJS)
 	cc $(CFLAGS) $(OBJS) -o $(NAME) 
 
-# gcc -fsanitize=thread -g 
-# valgrind --tool=helgrind ./philo <args>
-# valgrind --tool=drd ./philo <args>.
 %.o: %.c 
 	$(CC) $(CFLAGS) -c $< -o $@ 
 

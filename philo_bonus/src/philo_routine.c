@@ -12,14 +12,23 @@
 
 #include "../includes/philo_bonus.h"
 
+int	is_done(t_philo *philo)
+{
+	int	done;
+
+	done = 0;
+	sem_wait(philo->data->meal_check);
+	done = (philo->data->max_meals != -1
+			&& philo->meals_eaten >= philo->data->max_meals);
+	sem_post(philo->data->meal_check);
+	return (done);
+}
+
 void	philosopher_routine(t_philo *philo)
 {
 	pthread_t	monitor_thread;
-	int			done;
 
-	done = 0;
 	sem_wait(philo->data->sync);
-	// philo->last_meal_time = philo->data->start_time;
 	philo->last_meal_time = get_time_in_ms();
 	if (pthread_create(&monitor_thread, NULL, monitor_routine, philo))
 		exit(1);
@@ -31,11 +40,7 @@ void	philosopher_routine(t_philo *philo)
 		take_forks(philo);
 		eat(philo);
 		put_down_forks(philo);
-		sem_wait(philo->data->meal_check);
-		done = (philo->data->max_meals != -1
-				&& philo->meals_eaten >= philo->data->max_meals);
-		sem_post(philo->data->meal_check);
-		if (done)
+		if (is_done(philo))
 		{
 			if (philo->data->max_meals > 0)
 				sem_post(philo->done);

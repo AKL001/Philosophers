@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../includes/philo_bonus.h"
+#include <limits.h>
 
 int	ft_isdigit(int c)
 {
@@ -76,5 +77,7 @@ int	ft_atoi(const char *src)
 		nb = (nb * 10) + (src[i] - '0');
 		i++;
 	}
+	if (nb * sign > INT_MAX)
+		return (-1);
 	return (nb * sign);
 }
