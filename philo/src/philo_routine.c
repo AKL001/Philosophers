@@ -32,8 +32,6 @@ void	*philosopher_routine(void *arg)
 	t_philosopher	*philo;
 
 	philo = (t_philosopher *)arg;
-	// while (get_time_in_ms() < philo->data->start_time)
-	// 	continue ;
 	if (philo->data->num_philos == 1)
 	{
 		pthread_mutex_lock(philo->left_fork);
