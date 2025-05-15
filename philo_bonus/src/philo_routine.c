@@ -19,11 +19,11 @@ void	philosopher_routine(t_philo *philo)
 
 	done = 0;
 	sem_wait(philo->data->sync);
+	// philo->last_meal_time = philo->data->start_time;
 	philo->last_meal_time = get_time_in_ms();
 	if (pthread_create(&monitor_thread, NULL, monitor_routine, philo))
 		exit(1);
 	pthread_detach(monitor_thread);
-	philo->data->start_time = get_time_in_ms();
 	if (philo->id % 2 == 0)
 		usleep(1000);
 	while (is_simulation_running(philo->data))

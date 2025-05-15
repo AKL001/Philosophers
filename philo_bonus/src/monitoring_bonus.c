@@ -84,6 +84,7 @@ int	start_processes(t_data *data)
 	pthread_t	meal_monitor;
 
 	i = 0;
+	data->start_time = get_time_in_ms();
 	while (i < data->num_philos)
 	{
 		data->philos[i].pid = fork();

@@ -14,14 +14,15 @@ OBJS = $(SRCS:.c=.o)
 
 NAME = philo_bonus
 
-CFLAGS = -Wall -Wextra -Werror -g -pthread -fsanitize=thread 
+CFLAGS = -Wall -Wextra -Werror 
+# -pthread -fsanitize=thread 
 
 all: $(NAME)
 
 $(NAME): $(OBJS)
 	cc $(CFLAGS) $(OBJS) -o $(NAME) 
 	@make clean	
-	
+
 # gcc -fsanitize=thread -g 
 # valgrind --tool=helgrind ./philo <args>
 # valgrind --tool=drd ./philo <args>.
