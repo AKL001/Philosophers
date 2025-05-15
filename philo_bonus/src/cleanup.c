@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cleanup.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ablabib <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/15 10:58:56 by ablabib           #+#    #+#             */
+/*   Updated: 2025/05/15 10:58:58 by ablabib          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/philo_bonus.h"
 
 void	unlink_semaphores(void)
@@ -5,7 +17,6 @@ void	unlink_semaphores(void)
 	sem_unlink(SEM_SYNC);
 	sem_unlink(SEM_FORKS);
 	sem_unlink(SEM_PRINT);
-	// sem_unlink(SEM_ALL_ATE);
 	sem_unlink(SEM_MEAL_CHECK);
 	sem_unlink(SEM_DEAD);
 	sem_unlink(SEM_SIM_STATUS);
@@ -27,8 +38,6 @@ void	close_semaphores(t_data *data)
 		sem_close(data->dead);
 	if (data->sim_status)
 		sem_close(data->sim_status);
-	// if (data->all_ate)
-	// 	sem_close(data->all_ate);
 	if (data->philos)
 	{
 		i = 0;
@@ -44,13 +53,14 @@ void	close_semaphores(t_data *data)
 void	kill_processes(t_data *data)
 {
 	int	i;
-	// i = 0;
-	// while (i < data->num_philos)
-	// {
-	// 	if (data->pids[i] > 0)
-	// 		kill(data->pids[i], SIGTERM);
-	// 	i++;
-	// }
+
+	i = 0;
+	while (i < data->num_philos)
+	{
+		if (data->pids[i] > 0)
+			kill(data->pids[i], SIGKILL);
+		i++;
+	}
 	i = 0;
 	while (i < data->num_philos)
 	{
@@ -79,17 +89,10 @@ void	cleanup(t_data *data)
 
 	if (!data)
 		return ;
-	sem_wait(data->sim_status);
-	data->is_simulation_running = 0;
-	sem_post(data->sim_status);
 	if (data->max_meals != -1)
 		unblock_meal_monitor(data);
-
 	if (data->max_meals != -1 && data->meal_monitor_tid)
 		pthread_join(data->meal_monitor_tid, NULL);
-	if (data->is_dead_monitor_tid)
-		pthread_join(data->is_dead_monitor_tid, NULL);
-
 	if (data->pids)
 		free(data->pids);
 	close_semaphores(data);

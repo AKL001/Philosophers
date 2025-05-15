@@ -1,9 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ablabib <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/15 10:59:31 by ablabib           #+#    #+#             */
+/*   Updated: 2025/05/15 10:59:32 by ablabib          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/philo_bonus.h"
 #include <string.h>
 
 int	is_simulation_running(t_data *data)
 {
 	int	running;
+
 	if (!data || !data->sim_status)
 		return (0);
 	sem_wait(data->sim_status);
@@ -16,8 +29,9 @@ void	print_action(t_philo *philo, char *action)
 {
 	long long	timestamp;
 
-	if (!philo || !philo->data || !is_simulation_running(philo->data) || !philo->data->print)
-		return;
+	if (!philo || !philo->data || !is_simulation_running(philo->data)
+		|| !philo->data->print)
+		return ;
 	sem_wait(philo->data->print);
 	timestamp = get_time_in_ms() - philo->data->start_time;
 	printf("%lld %d %s\n", timestamp, philo->id, action);
@@ -26,8 +40,8 @@ void	print_action(t_philo *philo, char *action)
 
 void	start_simulation(t_data *data)
 {
-	int i;
-	
+	int	i;
+
 	data->is_simulation_running = 1;
 	if (start_processes(data))
 	{
@@ -46,7 +60,6 @@ int	main(int argc, char **argv)
 	t_data	data;
 
 	memset(&data, 0, sizeof(t_data));
-
 	if (argc != 5 && argc != 6)
 	{
 		printf("Usage: ./philo_bonus num_philos time_to_die ");

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ablabib <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/15 10:59:06 by ablabib           #+#    #+#             */
+/*   Updated: 2025/05/15 10:59:13 by ablabib          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/philo_bonus.h"
 #include <string.h>
 
@@ -10,8 +22,9 @@ int	valid_arguments(int argc, char **argv, t_data *data)
 	data->max_meals = -1;
 	if (argc == 6)
 		data->max_meals = ft_atoi(argv[5]);
-	if (data->num_philos <= 0 || data->time_to_die <= 0 || data->time_to_eat <= 0
-		|| data->time_to_sleep <= 0 || (argc == 6 && data->max_meals <= 0))
+	if (data->num_philos <= 0 || data->time_to_die <= 0
+		|| data->time_to_eat <= 0 || data->time_to_sleep <= 0 || (argc == 6
+			&& data->max_meals <= 0))
 	{
 		ft_putstr_fd("Error: Invalid arguments\n", 2);
 		return (1);
@@ -21,18 +34,13 @@ int	valid_arguments(int argc, char **argv, t_data *data)
 
 int	init_semaphores(t_data *data)
 {
-	// int i;
-
 	unlink_semaphores();
-	// sem_unlink(SEM_SYNC);
 	data->sync = sem_open(SEM_SYNC, O_CREAT, 0644, 0);
 	if (data->sync == SEM_FAILED)
-		return 1;
-		
+		return (1);
 	data->forks = sem_open(SEM_FORKS, O_CREAT, 0644, data->num_philos);
 	if (data->forks == SEM_FAILED)
 		return (1);
-	
 	data->print = sem_open(SEM_PRINT, O_CREAT, 0644, 1);
 	if (data->print == SEM_FAILED)
 		return (1);
@@ -42,18 +50,9 @@ int	init_semaphores(t_data *data)
 	data->dead = sem_open(SEM_DEAD, O_CREAT, 0644, 0);
 	if (data->dead == SEM_FAILED)
 		return (1);
-	// init simulation 
 	data->sim_status = sem_open(SEM_SIM_STATUS, O_CREAT, 0644, 1);
 	if (data->sim_status == SEM_FAILED)
 		return (1);
-	
-	// if (data->max_meals != -1)
-	// {
-	// 	data->all_ate = sem_open(SEM_ALL_ATE, O_CREAT, 0644, 0);
-	// 	if (data->all_ate == SEM_FAILED)
-	// 		return (1);
-	// }
-	
 	return (0);
 }
 
@@ -75,8 +74,8 @@ static int	setup_philo_done_sem(t_data *data, int i)
 	sem_unlink(data->philos[i].done_sem_name);
 	if (data->max_meals != -1)
 	{
-		data->philos[i].done = sem_open(data->philos[i].done_sem_name,
-				O_CREAT, 0644, 0);
+		data->philos[i].done = sem_open(data->philos[i].done_sem_name, O_CREAT,
+				0644, 0);
 		if (data->philos[i].done == SEM_FAILED)
 			return (1);
 	}
@@ -85,7 +84,7 @@ static int	setup_philo_done_sem(t_data *data, int i)
 
 int	init_philosophers(t_data *data)
 {
-	int		i;
+	int	i;
 
 	data->philos = malloc(sizeof(t_philo) * data->num_philos);
 	if (!data->philos)

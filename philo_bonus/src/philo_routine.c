@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo_routine.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ablabib <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/15 10:59:50 by ablabib           #+#    #+#             */
+/*   Updated: 2025/05/15 10:59:51 by ablabib          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/philo_bonus.h"
 
 void	philosopher_routine(t_philo *philo)
@@ -6,14 +18,12 @@ void	philosopher_routine(t_philo *philo)
 	int			done;
 
 	done = 0;
-
 	sem_wait(philo->data->sync);
-	philo->data->start_time = get_time_in_ms();
 	philo->last_meal_time = get_time_in_ms();
 	if (pthread_create(&monitor_thread, NULL, monitor_routine, philo))
 		exit(1);
-	// pthread_detach(monitor_thread);
-	philo->data->is_dead_monitor_tid = monitor_thread;
+	pthread_detach(monitor_thread);
+	philo->data->start_time = get_time_in_ms();
 	if (philo->id % 2 == 0)
 		usleep(1000);
 	while (is_simulation_running(philo->data))
@@ -21,19 +31,16 @@ void	philosopher_routine(t_philo *philo)
 		take_forks(philo);
 		eat(philo);
 		put_down_forks(philo);
-		
 		sem_wait(philo->data->meal_check);
-        done = (philo->data->max_meals != -1 && 
-                  philo->meals_eaten >= philo->data->max_meals);
-        sem_post(philo->data->meal_check);
-        
+		done = (philo->data->max_meals != -1
+				&& philo->meals_eaten >= philo->data->max_meals);
+		sem_post(philo->data->meal_check);
 		if (done)
-        {
-            if (philo->data->max_meals > 0)
-                sem_post(philo->done);
-            exit(0);
-			// break;
-        }
+		{
+			if (philo->data->max_meals > 0)
+				sem_post(philo->done);
+			exit(0);
+		}
 		ft_sleep(philo);
 		think(philo);
 	}

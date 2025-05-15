@@ -7,18 +7,21 @@ SRCS = 	src/main.c \
         src/util.c\
 		utils/libft.c\
 		utils/parsing.c\
+		utils/ft_itoa.c\
+		utils/libft_helper.c\
 
 OBJS = $(SRCS:.c=.o)
 
 NAME = philo_bonus
 
-CFLAGS = -Wall -Wextra -Werror -g 
-# -pthread -fsanitize=thread 
+CFLAGS = -Wall -Wextra -Werror -g -pthread -fsanitize=thread 
+
 all: $(NAME)
 
 $(NAME): $(OBJS)
 	cc $(CFLAGS) $(OBJS) -o $(NAME) 
 	@make clean	
+	
 # gcc -fsanitize=thread -g 
 # valgrind --tool=helgrind ./philo <args>
 # valgrind --tool=drd ./philo <args>.

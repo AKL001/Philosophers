@@ -1,12 +1,24 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   monitoring_bonus.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ablabib <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/15 10:59:42 by ablabib           #+#    #+#             */
+/*   Updated: 2025/05/15 10:59:43 by ablabib          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/philo_bonus.h"
 #include <string.h>
 
-void stop_simulation(t_data *data)
+void	stop_simulation(t_data *data)
 {
-    sem_wait(data->sim_status);
-    data->is_simulation_running = 0;
-    sem_post(data->sim_status);
-    sem_post(data->dead); 
+	sem_wait(data->sim_status);
+	data->is_simulation_running = 0;
+	sem_post(data->sim_status);
+	sem_post(data->dead);
 }
 
 void	*monitor_routine(void *arg)
@@ -19,17 +31,17 @@ void	*monitor_routine(void *arg)
 	{
 		sem_wait(philo->data->meal_check);
 		time_since_last_meal = get_time_in_ms() - philo->last_meal_time;
-
 		if (time_since_last_meal > philo->data->time_to_die)
 		{
 			sem_wait(philo->data->print);
-            printf("\033[0;31m%lld %d died\033[0m\n",
-				get_time_in_ms() - philo->data->start_time, philo->id);
-			
-			stop_simulation(philo->data);
+			printf("\033[0;31m%lld %d died\033[0m\n", get_time_in_ms()
+				- philo->data->start_time, philo->id);
+			sem_post(philo->data->dead);
+			sem_wait(philo->data->sim_status);
+			philo->data->is_simulation_running = 0;
+			sem_post(philo->data->sim_status);
 			sem_post(philo->data->meal_check);
-			// exit(1);
-			return (NULL);
+			exit(1);
 		}
 		sem_post(philo->data->meal_check);
 		usleep(500);
@@ -42,7 +54,6 @@ void	*meal_monitor_routine(void *arg)
 	t_data	*data;
 	int		i;
 
-
 	data = (t_data *)arg;
 	if (data->max_meals == 0)
 		return (NULL);
@@ -50,22 +61,19 @@ void	*meal_monitor_routine(void *arg)
 	while (i < data->num_philos)
 	{
 		if (!is_simulation_running(data))
-			break;
-		// will wait initl all ate is 1 ? 
+			break ;
 		sem_wait(data->philos[i].done);
-
 		if (!is_simulation_running(data))
-			break;
+			break ;
 		i++;
 	}
 	if (i == data->num_philos && is_simulation_running(data))
-    {
+	{
 		sem_wait(data->sim_status);
-        data->is_simulation_running = 0;
+		data->is_simulation_running = 0;
 		sem_post(data->sim_status);
-
 		sem_post(data->dead);
-    }
+	}
 	data->meal_monitor_running = 0;
 	return (NULL);
 }
@@ -89,7 +97,6 @@ int	start_processes(t_data *data)
 		data->pids[i] = data->philos[i].pid;
 		i++;
 	}
-	
 	if (data->max_meals > 0)
 	{
 		data->meal_monitor_running = 1;
@@ -104,7 +111,7 @@ void	wait_for_processes(t_data *data)
 {
 	sem_wait(data->dead);
 	sem_wait(data->sim_status);
-    data->is_simulation_running = 0;
-    sem_post(data->sim_status);
+	data->is_simulation_running = 0;
+	sem_post(data->sim_status);
 	kill_processes(data);
 }

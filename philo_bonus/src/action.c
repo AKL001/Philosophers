@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   action.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ablabib <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/15 10:58:41 by ablabib           #+#    #+#             */
+/*   Updated: 2025/05/15 10:58:44 by ablabib          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/philo_bonus.h"
 
 void	put_down_forks(t_philo *philo)
@@ -22,8 +34,6 @@ void	think(t_philo *philo)
 		time_to_think = 0;
 	else if (time_to_think > 200)
 		time_to_think = 200;
-	// else if (time_to_think < 10)
-	// 	time_to_think = 10;
 	smart_sleep(time_to_think, philo->data);
 }
 
