@@ -44,8 +44,6 @@ philosophers/
 ```
 START THREAD
     |
-    |__ Think
-    |
     |__ Pick up forks (lock mutexes)
     |
     |__ Update last_meal_time
@@ -55,6 +53,8 @@ START THREAD
     |__ Put down forks (unlock mutexes)
     |
     |__ Sleep
+    |
+    |__ Think
     |
 (Repeat)
 ```
@@ -96,3 +96,22 @@ void smart_sleep(long time_in_ms, t_settings *settings)
     }
 }
 ```
+
+```
+void	think(t_philosopher *philo)
+{
+	long long	time_to_think;
+
+	pthread_mutex_lock(&philo->data->meal_lock);
+	time_to_think = (philo->data->time_to_die - (get_time_in_ms()
+				- philo->last_meal_time)) / 2;
+	pthread_mutex_unlock(&philo->data->meal_lock);
+	if (time_to_think < 0)
+		time_to_think = 0;
+	if (time_to_think > 200)
+		time_to_think = 200;
+	print_action(philo, "is thinking");
+	smart_sleep(time_to_think, philo->data);
+}
+```
+
