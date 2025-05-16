@@ -12,9 +12,31 @@
 
 #include "../includes/philo_bonus.h"
 #include <string.h>
+#include <stdbool.h>
+
+bool check(const char *str)
+{
+	int i;
+
+	i = 0;
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	while(str[i]) 
+	{
+		if (!(str[i] >= '0' && str[i] <= '9'))
+			return true;
+	}
+	return false;
+}
 
 int	valid_arguments(int argc, char **argv, t_data *data)
 {
+	if (check(argv[1]) || check(argv[2]) || check(argv[3]) 
+		||check(argv[4]) ||check(argv[5]))
+	{
+		ft_putstr_fd("Error: Invalid arguments only numbers\n", 2);
+		return (1);
+	}
 	data->num_philos = ft_atoi(argv[1]);
 	data->time_to_die = ft_atoi(argv[2]);
 	data->time_to_eat = ft_atoi(argv[3]);

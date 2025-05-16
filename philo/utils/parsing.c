@@ -11,10 +11,26 @@
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
+#include <stdbool.h>
+
+bool check(const char *str)
+{
+	int i;
+
+	i = 0;
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	while(str[i]) 
+	{
+		if (!(str[i] >= '0' && str[i] <= '9'))
+			return true;
+	}
+	return false;
+}
 
 int	valid_philo_num(const char *arg)
 {
-	if (ft_atoi(arg) <= 0)
+	if (check(arg) || ft_atoi(arg) <= 0)
 	{
 		ft_putstr_fd("Error: Invalid number of philosophers argument\n", 2);
 		return (1);
@@ -24,7 +40,7 @@ int	valid_philo_num(const char *arg)
 
 int	valid_ms(const char *arg)
 {
-	if (ft_atoi(arg) <= 0)
+	if (check(arg) ||ft_atoi(arg) <= 0)
 	{
 		ft_putstr_fd("Error: Invalid number of ms argument\n", 2);
 		return (1);
@@ -34,7 +50,7 @@ int	valid_ms(const char *arg)
 
 int	valid_must_eat(const char *arg)
 {
-	if (ft_atoi(arg) <= 0)
+	if (check(arg) ||ft_atoi(arg) <= 0)
 	{
 		ft_putstr_fd("Error: Invalid number of must eat argument\n", 2);
 		return (1);
