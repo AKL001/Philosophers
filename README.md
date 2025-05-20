@@ -1,4 +1,4 @@
-<h1> Just Brain Storming </h1>
+<h1> Mind MAP </h1>
 
 ```
 [main.c]
